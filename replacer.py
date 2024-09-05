@@ -23,7 +23,7 @@ def detect_encoding(file_path):
 
 def inParse(string: str):
     for key, value in parse.items():
-        if value in string:
+        if key in string:
             find = string.find(value)
             print(key)
             print(find)
