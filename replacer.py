@@ -11,15 +11,16 @@ parse = {
 }
 
 def detect_encoding(file_path):
+    encoding = ''
     with open(file_path, 'rb') as file:
         detector = chardet.universaldetector.UniversalDetector()
         for line in file:
+            encoding = chardet.detect(line)
             detector.feed(line)
             if detector.done:
                 break
         detector.close()
-    return detector.result['encoding']
-
+    return encoding['encoding']
 
 def inParse(string: str):
     for key, value in parse.items():
@@ -30,26 +31,31 @@ def inParse(string: str):
             print(string[find:find+25])
             return True
 
-path = Path("C:\\fontes\\proxsis\\promanager\\aplicativo\\modulos")
-for caminho in path.iterdir():
-    if caminho.is_dir():
-        children = Path(caminho)
-        for child in children.iterdir():
-            if str(child)[-4:] == '.pas':
-                try:
-                    enco = detect_encoding(child)
-                    if str(enco) != 'UTF-8-SIG':
-                        print(f"{child} -> {enco}")
-                        with open(child, 'r', encoding=enco) as file:
-                            data = file.read()
-                            if inParse(data):
-                                for key, value in parse.items():
-                                    data = data.replace(str(key), str(value))
+paths = ["C:\\fontes\\proxsis\\promanager\\aplicativo", "C:\\fontes\\proxsis\\promanager\\aplicativo\\modulos"]
+for path in paths:
+    path = Path(path)
+    for caminho in path.iterdir():
+        if caminho.is_dir():
+            children = Path(caminho)
+            for child in children.iterdir():
+                if str(child)[-4:] in ['.pas', '.dfm']:
+                    try:
+                        enco = detect_encoding(child)
+                        if enco != "UTF-8-SIG":
+                            print(f"{child} -> {enco}")
+                            with open(child, 'r', encoding=enco) as file:
+                                data = file.read()
+                                # if inParse(data):
+                                #     for key, value in parse.items():
+                                #         data = data.replace(str(key), str(value))
                                 data.encode('UTF-8-SIG')
                                 with open(child, 'w', encoding='UTF-8-SIG') as txt:
-                                    txt.write(data)
+                                    if txt != '':
+                                        txt.write(data)
+                        else:
+                            continue        
                                 
-                except Exception as e:
-                    print(f'Erro {e} no arquivo {child}')
-    else:
-        continue
+                    except Exception as e:
+                        print(f'Erro {e} no arquivo {child}')
+        else:
+            continue
