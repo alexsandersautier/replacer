@@ -38,7 +38,7 @@ for path in paths:
         if caminho.is_dir():
             children = Path(caminho)
             for child in children.iterdir():
-                if str(child)[-4:] in ['.pas', '.dfm']:
+                if str(child)[-4:] in ['.pas']:
                     try:
                         enco = detect_encoding(child)
                         if enco != "UTF-8-SIG":
